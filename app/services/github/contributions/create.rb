@@ -15,10 +15,12 @@ module Github
 
         collect_all_contributions
           .map do |result|
+            binding.pry
             find_or_create_contribution(
               result.uid,
               result.rid,
-              result.pull_request._links.html.href,
+              # result.pull_request._links.html.href,
+              result.pull_request.html_url,
               result.pull_request.created_at
             )
           end

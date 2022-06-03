@@ -77,6 +77,12 @@ Now run the servers:
 $ docker-compose up
 ```
 
+If you want to use the Rails Conole
+
+```console
+docker-compose run --rm runner bundle exec rails c
+```
+
 ## Testing
 
 This app uses RSpec, Factory Girl, Forgery and Faker to fake reality.
