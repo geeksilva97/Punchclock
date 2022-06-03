@@ -16,6 +16,7 @@ module Github
 
         repository_links = Set.new()
         repository_id_by_link = {}
+        engineer_github_id = {}
 
         company.repositories.each do |repository|
           repository_base_url = repository.link.gsub(repo_regex, "")
@@ -32,7 +33,11 @@ module Github
         engineers.select { | e | test_users.member? e.github }.each do |engineer|
         # engineers.each do |engineer|
           found_prs = client.search.issues(q: "author:#{engineer.github} is:pr created:#{current_date}")
-          pull_requests.concat( found_prs.items )
+          
+          if found_prs.items.size > 0
+            pull_requests.concat( found_prs.items )
+            engineer_github_id[engineer.github] = engineer.id
+          end
         end
         
         pull_requests.select do |pr|
@@ -40,7 +45,8 @@ module Github
           repository_links.member? partial_url
         end.map do |pull_request|
           partial_url = pull_request.html_url.gsub(repo_regex, '').split('/').slice(0,2).join('/')
-          Result.new(3, repository_id_by_link[partial_url], pull_request)
+          user_id = engineer_github_id[pull_request.user.login]
+          Result.new(user_id, repository_id_by_link[partial_url], pull_request)
         end
 
         # repositories.flat_map do |repository_id, repository_owner, repository_name|
