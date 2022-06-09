@@ -11,9 +11,9 @@ module Github
       end
 
       def all
-        return [] if company.blank?
+        return [] if company.blank? or repositories.empty? or engineers.empty?
 
-        yesterday_date = 1.day.ago.strftime("%Y-%m-%d") # YYYY-MM-DD
+        yesterday_date = 1.day.ago.strftime("%Y-%m-%d")
 
         repository_query = repositories.map do |repository_id, repository_owner, repository_name|
           "repo:#{repository_owner}/#{repository_name}"
@@ -25,6 +25,7 @@ module Github
 
         query = "created:#{yesterday_date} is:pr #{author_query} #{repository_query}"
 
+        puts client.search
         client.search.issues(q: query).items.map do | pull_request |
           # TODO: Find a way to get both user_id and repository_id
           Result.new(user_id, repository_id, pull_request)

@@ -12,7 +12,8 @@ RSpec.describe Github::Contributions::Collect, type: :service do
   describe '#all' do
     subject(:all) { described_class.new(company: company, client: client).all }
 
-    let(:client) { instance_double('Github') }
+    let(:client) { class_double('Github') }
+    # let(:client) { Github.new }
 
     context 'when company is not present' do
       let(:company) { nil }
@@ -22,6 +23,10 @@ RSpec.describe Github::Contributions::Collect, type: :service do
 
     context 'when there are no repositories in database' do
       let(:company) { build_stubbed(:company) }
+      
+      # before do
+      #   allow(client).to receive_message_chain(:search, :issues, :items => [])
+      # end
 
       it { is_expected.to be_empty }
     end
