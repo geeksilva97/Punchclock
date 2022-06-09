@@ -23,14 +23,23 @@ RSpec.describe Github::Contributions::Collect, type: :service do
 
     context 'when there are no repositories in database' do
       let(:company) { build_stubbed(:company) }
-      
-      # before do
-      #   allow(client).to receive_message_chain(:search, :issues, :items => [])
-      # end
 
       it { is_expected.to be_empty }
     end
 
     # TODO: Add specs to cover all use cases
+
+    context 'when search fails' do
+      let(:company) { build_stubbed(:company) }
+      subject { described_class.new(company: company, client: client) }
+
+      before do
+        allow(client).to receive_message_chain("search.issues.items") { raise 'network error' }
+        allow(subject).to receive(:repositories).and_return([[1, 'flutter', 'fllutter']])
+        allow(subject).to receive(:engineers).and_return([[1, 'wenderjean']])
+      end
+
+      it { expect{ subject.all }.to raise_error('network error') }
+    end
   end
 end
